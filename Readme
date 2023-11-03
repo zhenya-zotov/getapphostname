@@ -1,0 +1,105 @@
+docker build -t killerproc/getapphost ./
+docker run --name getapphost-container -p 8081:8080 -d killerproc/getapphost
+
+Дополнительная информация:
+docker inspect getapphost-container
+
+Запуск оболочки shell:
+docker exec -it getapphost-container sh
+
+-i убеждается, что STDIN держится открытым. Это необходимо для ввода команд в оболочку;
+-t выделяет псевдотерминал (TTY)
+
+Push изменения на docker hub:
+docker push killerproc/getapphost
+
+-----------------------------
+Kubernetes:
+
+1. Вывод всех node:
+kubectl get nodes - список доступных узлов
+
+Доп. информация:
+kubectl describe node {name node from get nodes}
+
+2. Создание деплоймента:
+kubectl create deployment getapphost-node --image=killerproc/getapphost
+2.1 Посмотреть информацию о Deployment:
+kubectl get deployments
+
+
+3. Создание сервиса:
+3.1. kubectl expose deployment getapphost-node --type=LoadBalancer --port=8080
+service/getapphost-node exposed
+
+3.2 Посмотреть сервис:
+kubectl get services
+
+└─ $ ▶ kubectl get services
+NAME              TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+getapphost-node   LoadBalancer   10.111.70.237    <pending>     8082:15336/TCP   87s
+
+ДОП ИНФА:
+kubectl edit service getapphost-node - редактировать настройки сервиса
+
+3.3 Запуск сервиса:
+minikube service getapphost-node
+
+4. МАСШТАБИРОВАНИЕ СЕРВИСА:
+ReplicaSet:
+kubectl get rs
+
+Увеличить реплики:
+└─ $ ▶ kubectl scale deployments/getapphost-node --replicas=4
+deployment.apps/getapphost-node scaled
+
+└─ $ ▶ kubectl get deployment
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+getapphost-node     2/4     4            2           3m51s
+mongo-deployment    1/1     1            1           128d
+nginx               1/1     1            1           128d
+sbil-deployment     1/1     1            1           125d
+webapp-deployment   1/1     1            1           128d
+
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-qpzk6</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t8546</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t57hj</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t8546</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-qpzk6</p>
+
+
+└─ $ ▶ kubectl scale deployments/getapphost-node --replicas=1
+deployment.apps/getapphost-node scaled
+
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t57hj</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t57hj</p>
+└─ $ ▶ curl http://{IP}:17451/
+<p>Hello, I'm getapphost-node-c8dc6f9b5-t57hj</p>
+└─ $ ▶ curl http://{IP}:17451/
+
+
+Удаления всего нового:
+└─ $ ▶ kubectl delete service getapphost-node
+service "getapphost-node" deleted
+e-zotov @ LT1-LL-006 ~/MY_HOME_PROJECTS/hostname_vm
+└─ $ ▶ kubectl delete deployment getapphost-node
+deployment.apps "getapphost-node" deleted
+
+
+ДИАГНОСТИКА:
+kubectl get — вывод списка ресурсов;
+kubectl describe — вывод подробной информации о ресурсе;
+kubectl logs — вывод логов контейнера в поде;
+kubectl exec — выполнение команды в контейнере пода
+
+
+С ПОМОЩЬЮ ФАЙЛОВ:
+kubectl apply -f .cicd/getapphost-deployment.yaml
+kubectl apply -f .cicd/getapphost-service.yaml

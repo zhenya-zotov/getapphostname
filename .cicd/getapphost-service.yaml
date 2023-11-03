@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: getapphost-service
+spec:
+  allocateLoadBalancerNodePorts: true
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: getapphost-deployment
+  sessionAffinity: None
+status:
+  loadBalancer: {}
