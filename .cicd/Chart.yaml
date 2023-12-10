@@ -1,0 +1,12 @@
+apiVersion: v2
+name: GetAppHostName-HelmChart
+description: Test Helm Chart for k8s
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - "http"
+  - "killerproc/getapphost"
+maintainers:
+  - name: Zhenya Zotov

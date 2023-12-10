@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: getapphost-deployment
+  name: {{ .Release.Name }}-deployment
   labels:
-    app: getapphost-deployment
+    app: {{ .Release.Name }}-deployment
 spec:
   progressDeadlineSeconds: 600
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -15,16 +15,16 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: getapphost-deployment
+      app: {{ .Release.Name }}-deployment
   template:
     metadata:
       labels:
-        app: getapphost-deployment
+        app: {{ .Release.Name }}-deployment
     spec:
       containers:
-      - image: killerproc/getapphost
+      - image: {{ .Values.container.image }}
         imagePullPolicy: Always
-        name: getapphost
+        name: {{ .Release.Name }}-web
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File

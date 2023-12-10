@@ -1,0 +1,4 @@
+container:
+  image: killerproc/getapphost:latest
+
+replicaCount: 1

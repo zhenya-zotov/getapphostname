@@ -103,3 +103,13 @@ kubectl exec — выполнение команды в контейнере п�
 С ПОМОЩЬЮ ФАЙЛОВ:
 kubectl apply -f .cicd/getapphost-deployment.yaml
 kubectl apply -f .cicd/getapphost-service.yaml
+
+
+-----------------------------
+Deploy app:
+
+1. helm install getapphostname .cicd/
+
+2. Обновить: helm upgrade getapphostname .cicd/
+
+3. Удалить: helm delete getapphostname
